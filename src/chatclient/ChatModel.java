@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
+import share.ISocket;
+
 /**
  * @author a1199022
  *
@@ -15,7 +17,7 @@ public class ChatModel {
 	private ISocket socket; // ソケット。このクラスはこのソケットが本物かテスト用かは知らない
 	private List<ChatMessage> messageLog = new ArrayList<>(); // 過去に受信したメッセージのログ
 	private ChatModelListener listener;
-	private String myname;
+	private String myName;
 	private Map<String, Boolean> talkerFilter = new HashMap<>();
 	
 	public ChatModel(final ISocket socket) {
@@ -63,7 +65,7 @@ public class ChatModel {
 	}
 
 	public void talk(String text) {
-		this.socket.writeText(this.myname + ";" + text);
+		this.socket.writeText(this.myName + ";" + text);
 	}
 
 	public String getConversation() {
@@ -81,8 +83,8 @@ public class ChatModel {
 		this.listener = chartModelListener;
 	}
 
-	public void setName(String text) {
-		this.myname = text;
+	public void setMyName(String text) {
+		this.myName = text;
 	}
 
 	public void setFilter(String name, boolean selected) {
@@ -92,5 +94,19 @@ public class ChatModel {
 
 	protected void fireConversationUpdate() {
 		listener.onConversationUpdated(getConversation());
+	}
+
+
+	public void exit() {
+		try {
+			this.socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	public String getMyName() {
+		return this.myName;
 	}
 }

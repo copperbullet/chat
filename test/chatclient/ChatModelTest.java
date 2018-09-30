@@ -5,6 +5,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+
+import share.ISocket;
 import junit.framework.TestCase;
 
 
@@ -66,7 +68,7 @@ public class ChatModelTest extends TestCase {
 		ISocket socket = new TestSocket();
 		ChatModel chatModel = new ChatModel(socket);
 		
-		chatModel.setName("Andre Young");
+		chatModel.setMyName("Andre Young");
 		// GUI‚©‚çtalk‚ªŒÄ‚Î‚ê‚½
 		chatModel.talk("Hello!");
 		

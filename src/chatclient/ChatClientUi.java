@@ -3,6 +3,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -11,28 +18,36 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class ChatUi extends JFrame {
-	public static void main(String[] args) {
+import share.RealSocket;
+
+public class ChatClientUi extends JFrame {
+	public static void main(String[] args) throws UnknownHostException, IOException {
 		
-		new ChatUi(new ChatModel(new RealSocket("localhost", 8001))).setVisible(true);
+		new ChatClientUi(new ChatModel(new RealSocket(new Socket("localhost", 8001)))).setVisible(true);
 	}
 	
-	public ChatUi(final ChatModel chatModel) {
+	public ChatClientUi(final ChatModel chatModel) {
 		this.setSize(new Dimension(600,400));
 		this.setLayout(new FlowLayout());
 		
-		//　自分の名前を入力するテキストフィールド
-		final JTextField myname = new JTextField("Your Name");
-		myname.setPreferredSize(new Dimension(300, 24));
-		this.add(myname);
-		JButton nameButton = new JButton("Set Name");
-		nameButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// ボタンが押されたら呼ぶ
-				chatModel.setName(myname.getText());
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				chatModel.exit();
 			}
 		});
-		this.add(nameButton);
+		//　自分の名前を入力するテキストフィールド
+		final JTextField myname = new JTextField(chatModel.getMyName());
+		myname.setPreferredSize(new Dimension(300, 24));
+		this.add(myname);
+		myname.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// ボタンが押されたら呼ぶ
+				chatModel.setMyName(myname.getText());
+			}
+		});
 		
 		//　送信する言葉を入力するテキストフィールド
 		final JTextField words = new JTextField("");

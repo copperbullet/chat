@@ -1,4 +1,4 @@
-package chatclient;
+package share;
 import java.io.IOException;
 
 public interface ISocket {

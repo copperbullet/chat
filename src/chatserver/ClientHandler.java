@@ -1,44 +1,47 @@
 package chatserver;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+
+import share.ISocket;
 
 public abstract class ClientHandler {
 
-	private PrintWriter writer;
+	private ISocket socket;
 
-	public ClientHandler(final Socket clientSocket) {
-			try {
-				writer = new PrintWriter(clientSocket.getOutputStream(), true);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			
-			new Thread() {
-				@Override
-				public void run() {
-					try {
-						BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-						String message = "";
-					
-						while ((message = reader.readLine()) != null) {
-							onMessageReceived(message);
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
+	public ClientHandler(final ISocket clientSocket) {	
+		this.socket = clientSocket;
+		
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					String message = "";
+				
+					while ((message = clientSocket.readLine()) != null) {
+					//	System.out.println("onMessageReceived " + message);
+						onMessageReceived(message);
 					}
+				} catch (IOException e) {
+					
 				}
-			}.start();
+				onClosed(ClientHandler.this);
+			}
+		}.start();
 	}
 
 	protected abstract void onMessageReceived(String message);
-
+	protected abstract void onClosed(ClientHandler clientHandler);
+	
 	public void sendMessage(String message) {
-		writer.write(message + "\n");
-		writer.flush();
+		socket.writeText(message);
+	}
+
+	public void stop() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

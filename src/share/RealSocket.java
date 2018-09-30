@@ -1,4 +1,4 @@
-package chatclient;
+package share;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,9 +12,9 @@ public class RealSocket implements ISocket {
 	private PrintWriter out;
 	private BufferedReader in;
 	
-	public RealSocket(String host, int port) {
+	public RealSocket(Socket socket) {
 		try {
-			socket = new Socket(host, port);
+			this.socket = socket;
 			out = new PrintWriter(socket.getOutputStream());
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (UnknownHostException e) {
