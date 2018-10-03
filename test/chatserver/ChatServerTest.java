@@ -25,17 +25,29 @@ public class ChatServerTest {
 		
 	
 	@Test
-	public void testChatServerDefaultValues() {
-		TestServerSocket serverSocket = new TestServerSocket();
-		ChatServer server = new ChatServer(serverSocket);
+	public void testChatServerDefaultValues() throws IOException {
+		final TestServerSocket serverSocket = new TestServerSocket();
+		ChatServer server = new ChatServer(6001) {
+			@Override
+			protected IServerSocket createServerSocket(int port)
+					throws IOException {
+				return serverSocket;
+			}
+		};
 		assertEquals("Start", server.getButtonLabel());
 		assertEquals(ServerState.IDLE, server.getStatus());
 	}
 
 	@Test
-	public void testGuiStatusWhenStartIsPushed() {
-		TestServerSocket serverSocket = new TestServerSocket();
-		ChatServer server = new ChatServer(serverSocket);
+	public void testGuiStatusWhenStartIsPushed() throws IOException {
+		final TestServerSocket serverSocket = new TestServerSocket();
+		ChatServer server = new ChatServer(6001) {
+			@Override
+			protected IServerSocket createServerSocket(int port)
+					throws IOException {
+				return serverSocket;
+			}
+		};	
 		
 		ChatServerListenerImpl listener = new ChatServerListenerImpl();
 		server.setListener(listener);
@@ -54,9 +66,15 @@ public class ChatServerTest {
 	}
 
 	@Test
-	public void testWhenClientIsConnected() throws InterruptedException {
-		TestServerSocket serverSocket = new TestServerSocket();
-		ChatServer server = new ChatServer(serverSocket);
+	public void testWhenClientIsConnected() throws InterruptedException, IOException {
+		final TestServerSocket serverSocket = new TestServerSocket();
+		ChatServer server = new ChatServer(6001) {
+			@Override
+			protected IServerSocket createServerSocket(int port)
+					throws IOException {
+				return serverSocket;
+			}
+		};
 		
 		ChatServerListenerImpl listener = new ChatServerListenerImpl();
 		server.setListener(listener);
@@ -73,6 +91,9 @@ public class ChatServerTest {
 		TestClientSocket clientSocket1 = serverSocket.getClients().get(0);
 		TestClientSocket clientSocket2 = serverSocket.getClients().get(1);
 		
+		//　クライアント2が受信するまで待つようにする 　テスト用
+		clientSocket2.setWaitEnabledWhenWritten(true);
+		
 //		System.out.println("1");
 		// クライアント1がHELLOをライトしたことを模擬
 		clientSocket1.simulateRead("HELLO");
@@ -83,5 +104,25 @@ public class ChatServerTest {
 		// 全クライアントにマルチキャストされる
 		assertEquals("HELLO", clientSocket1.getWrittenText().get(0));
 		assertEquals("HELLO", clientSocket2.getWrittenText().get(0));
+	}
+	
+	@Test
+	public void testServerSocketThrowsErrorAtStart() throws IOException {
+		ChatServer server = new ChatServer(6001) {
+			@Override
+			protected IServerSocket createServerSocket(int port)
+					throws IOException {
+				// ソケットオープン時にエラーにする
+				throw new IOException();
+			}
+		};
+		
+		ChatServerListenerImpl listener = new ChatServerListenerImpl();
+		server.setListener(listener);
+		
+		assertEquals("Start", server.getButtonLabel());
+		server.toggleStart();
+		assertEquals("Start", server.getButtonLabel());
+		assertEquals("Cannot start server", listener.getErrorMessage());
 	}
 }

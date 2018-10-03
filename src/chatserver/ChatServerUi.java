@@ -5,32 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.ServerSocket;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import share.ISocket;
-import share.RealSocket;
 import chatserver.ChatServer.ServerState;
 
 public class ChatServerUi extends JFrame {
 	protected static ChatServer createChatServer() throws IOException {
-		final ServerSocket realServerSocket = new ServerSocket(8001);
-	
-		IServerSocket serverSocket = new IServerSocket() {
-			@Override
-			public ISocket accept() throws IOException {
-				return new RealSocket(realServerSocket.accept());
-			}
-
-			@Override
-			public void close() throws IOException {
-				realServerSocket.close();
-			}
-		};
-		ChatServer chatServer = new ChatServer(serverSocket);
+		ChatServer chatServer = new ChatServer(8001);
 		return chatServer;
 	}
 	
@@ -60,6 +43,11 @@ public class ChatServerUi extends JFrame {
 			public void onStateChanged(ServerState state) {
 				startButton.setText(chatServer.getButtonLabel());
 				status.setText(state.toString());
+			}
+
+			@Override
+			public void onError(String message) {
+				status.setText(message);
 			}
 		});
 	}

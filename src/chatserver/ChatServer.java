@@ -3,7 +3,6 @@ package chatserver;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.SwingUtilities;
 
 import share.ISocket;
@@ -13,15 +12,23 @@ public class ChatServer {
 	private List<ClientHandler> clients = new ArrayList<>();
 	private ServerState status = ServerState.IDLE;
 	private IServerSocket serverSocket;
+	
 	private ChatServerListener chatServerListener = new ChatServerListener() {
 		@Override
-		public void onStateChanged(ServerState state) {
+		public void onStateChanged(ServerState state) {	}
 
-		}
+		@Override
+		public void onError(String message) {}
 	};
 	
-	public ChatServer(IServerSocket serverSocket) {
-		this.serverSocket = serverSocket;
+	private int port;
+	
+	public ChatServer(int port) throws IOException {
+		this.port = port;
+	}
+
+	protected IServerSocket createServerSocket(int port) throws IOException {
+		return new RealServerSocket(port);
 	}
 
 	public enum ServerState {
@@ -30,19 +37,11 @@ public class ChatServer {
 	}
 	
 	protected void startServer() {
-		
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				setStatus(ServerState.RUNNING);
-			}
-		});
-		
 		while (true) {
 			try {
 				ISocket clientSocket = serverSocket.accept();
 				
-				clients.add(new ClientHandler(clientSocket) {
+				ClientHandler clientHandler = new ClientHandler(clientSocket) {
 					@Override
 					protected void onMessageReceived(String message) {
 						sendMessageToAllClients(message);
@@ -52,7 +51,8 @@ public class ChatServer {
 					protected void onClosed(ClientHandler clientHandler) {
 						clients.remove(clientHandler);
 					}
-				});
+				};
+				clients.add(clientHandler);
 			}
 			catch(Exception e) {
 				break;
@@ -87,6 +87,19 @@ public class ChatServer {
 
 	public void toggleStart() {
 		if (this.status.equals(ServerState.IDLE)) {
+			try {
+				this.serverSocket = createServerSocket(port);
+			} catch (IOException e) {
+				this.chatServerListener.onError("Cannot start server");
+				return;
+			}
+			
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					setStatus(ServerState.RUNNING);
+				}
+			});
 			new Thread() {
 				@Override
 				public void run() {

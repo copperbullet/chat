@@ -10,16 +10,31 @@ public 	class TestClientSocket implements ISocket {
 	private Object readLock = null;
 	private String readText;
 	private List<String> writtenText = new ArrayList<>();
-	private Object writtenLock;
+	private Object writtenLock = null;
+	private boolean waitEnabledWhenWritten = false;
+	
+	public void setWaitEnabledWhenWritten(boolean enabled) {
+		this.waitEnabledWhenWritten  = enabled;
+	}
 	
 	@Override
 	public void writeText(String text) {
 		this.writtenText.add(text);
-		
-		if (writtenLock != null) {
-			synchronized(writtenLock) {
-				writtenLock.notify();
+		if (!waitEnabledWhenWritten) {
+//			System.out.println("writeText return");
+			return;
+		}
+		while (writtenLock == null) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
+		}
+		
+		synchronized(writtenLock) {
+//			System.out.println("writtenLock.notify()");
+			writtenLock.notify();
 		}
 	}
 
@@ -63,6 +78,7 @@ public 	class TestClientSocket implements ISocket {
 	}
 	
 	public void waitWritten() {
+//		System.out.println("waitWritten");
 		this.writtenLock = new Object();
 		synchronized(this.writtenLock) {
 			try {

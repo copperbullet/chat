@@ -2,6 +2,8 @@ package chatserver;
 
 import java.io.IOException;
 
+import javax.swing.SwingUtilities;
+
 import share.ISocket;
 
 public abstract class ClientHandler {
@@ -18,8 +20,7 @@ public abstract class ClientHandler {
 					String message = "";
 				
 					while ((message = clientSocket.readLine()) != null) {
-					//	System.out.println("onMessageReceived " + message);
-						onMessageReceived(message);
+						toMainThread(message);
 					}
 				} catch (IOException e) {
 					
@@ -29,6 +30,14 @@ public abstract class ClientHandler {
 		}.start();
 	}
 
+	protected void toMainThread(final String message) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				onMessageReceived(message);
+			}	
+		});
+	}
 	protected abstract void onMessageReceived(String message);
 	protected abstract void onClosed(ClientHandler clientHandler);
 	
