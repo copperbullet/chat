@@ -3,14 +3,10 @@ package chatserver;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import share.ISocket;
 import chatserver.ChatServer.ServerState;
 
 public class ChatServerTest {
@@ -79,6 +75,7 @@ public class ChatServerTest {
 		ChatServerListenerImpl listener = new ChatServerListenerImpl();
 		server.setListener(listener);
 		
+		// Startを押す。
 		server.toggleStart();
 		
 		// Start状態になるのを待つ
@@ -94,7 +91,6 @@ public class ChatServerTest {
 		//　クライアント2が受信するまで待つようにする 　テスト用
 		clientSocket2.setWaitEnabledWhenWritten(true);
 		
-//		System.out.println("1");
 		// クライアント1がHELLOをライトしたことを模擬
 		clientSocket1.simulateRead("HELLO");
 		
@@ -120,9 +116,17 @@ public class ChatServerTest {
 		ChatServerListenerImpl listener = new ChatServerListenerImpl();
 		server.setListener(listener);
 		
+		// 初期状態のボタンはStart
 		assertEquals("Start", server.getButtonLabel());
+		
+		// Startを押すがソケットオープンでエラーが出る。
 		server.toggleStart();
-		assertEquals("Start", server.getButtonLabel());
+		
+		// エラーメッセージが出ている
 		assertEquals("Cannot start server", listener.getErrorMessage());
+		
+		// ボタンはStartのまま
+		assertEquals("Start", server.getButtonLabel());
+		
 	}
 }
