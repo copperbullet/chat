@@ -12,6 +12,7 @@ public class ChatServer {
 	private List<ClientHandler> clients = new ArrayList<>();
 	private ServerState status = ServerState.IDLE;
 	private IServerSocket serverSocket;
+	private int port;
 	
 	private ChatServerListener chatServerListener = new ChatServerListener() {
 		@Override
@@ -20,9 +21,7 @@ public class ChatServer {
 		@Override
 		public void onError(String message) {}
 	};
-	
-	private int port;
-	
+		
 	public ChatServer(int port) throws IOException {
 		this.port = port;
 	}
