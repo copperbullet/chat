@@ -5,7 +5,7 @@ import java.util.List;
 
 import chatserver.ChatServer.ServerState;
 
-public 	class ChatServerListenerImpl implements ChatServerListener{
+public 	class TestChatServerListener implements ChatServerListener{
 	private List<ServerState> serverStateLog = new ArrayList<>();
 	private Object sync = null;
 	private String errorMessage = "";

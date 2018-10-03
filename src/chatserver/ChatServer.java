@@ -36,7 +36,7 @@ public class ChatServer {
 		RUNNING
 	}
 	
-	protected void startServer() {
+	private void startServer() {
 		while (true) {
 			try {
 				ISocket clientSocket = serverSocket.accept();

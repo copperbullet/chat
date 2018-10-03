@@ -45,7 +45,7 @@ public class ChatServerTest {
 			}
 		};	
 		
-		ChatServerListenerImpl listener = new ChatServerListenerImpl();
+		TestChatServerListener listener = new TestChatServerListener();
 		server.setListener(listener);
 		
 		// Startを押す。
@@ -72,7 +72,7 @@ public class ChatServerTest {
 			}
 		};
 		
-		ChatServerListenerImpl listener = new ChatServerListenerImpl();
+		TestChatServerListener listener = new TestChatServerListener();
 		server.setListener(listener);
 		
 		// Startを押す。
@@ -113,7 +113,7 @@ public class ChatServerTest {
 			}
 		};
 		
-		ChatServerListenerImpl listener = new ChatServerListenerImpl();
+		TestChatServerListener listener = new TestChatServerListener();
 		server.setListener(listener);
 		
 		// 初期状態のボタンはStart
