@@ -19,7 +19,10 @@ public class ChatServerTest {
 	public void tearDown() throws Exception {
 	}
 		
-	
+	/**
+	 * 起動時の初期状態のテスト
+	 * GUIの表示状態をテストする
+	 */
 	@Test
 	public void testChatServerDefaultValues() throws IOException {
 		final TestServerSocket serverSocket = new TestServerSocket();
@@ -30,10 +33,17 @@ public class ChatServerTest {
 				return serverSocket;
 			}
 		};
+		// ボタンがStartであること
 		assertEquals("Start", server.getButtonLabel());
+		
+		//　状態がIDLEであること
 		assertEquals(ServerState.IDLE, server.getStatus());
 	}
 
+	/**
+	 * Startボタンが押されたときのテスト
+	 * GUIの表示状態をテストする
+	 */
 	@Test
 	public void testGuiStatusWhenStartIsPushed() throws IOException {
 		final TestServerSocket serverSocket = new TestServerSocket();
@@ -57,10 +67,15 @@ public class ChatServerTest {
 		// 状態はRunningになっていればOK
 		assertEquals(ServerState.RUNNING, server.getStatus());
 		assertEquals(ServerState.RUNNING, listener.getServerStateLog().get(0));
+		
 		// ボタンはSTOPになっている
 		assertEquals("Stop", server.getButtonLabel());
 	}
 
+	/**
+	 * Startボタンが押されたときのテスト
+	 * 複数のクライアントにメッセージがマルチキャストされることをテスト
+	 */
 	@Test
 	public void testWhenClientIsConnected() throws InterruptedException, IOException {
 		final TestServerSocket serverSocket = new TestServerSocket();
@@ -102,6 +117,10 @@ public class ChatServerTest {
 		assertEquals("HELLO", clientSocket2.getWrittenText().get(0));
 	}
 	
+	
+	/**
+	 * Startボタンが押されたときにソケットがエラーが出したときのテスト
+	 */
 	@Test
 	public void testServerSocketThrowsErrorAtStart() throws IOException {
 		ChatServer server = new ChatServer(6001) {

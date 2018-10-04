@@ -12,6 +12,11 @@ import javax.swing.JLabel;
 import chatserver.ChatServer.ServerState;
 
 public class ChatServerUi extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected static ChatServer createChatServer() throws IOException {
 		ChatServer chatServer = new ChatServer(8001);
 		return chatServer;

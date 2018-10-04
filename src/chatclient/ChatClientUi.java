@@ -21,6 +21,11 @@ import javax.swing.JTextField;
 import share.RealSocket;
 
 public class ChatClientUi extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		
 		new ChatClientUi(new ChatModel(new RealSocket(new Socket("localhost", 8001)))).setVisible(true);
